@@ -1,21 +1,101 @@
 # Wiom Solution Design Engine V1
 
-Design system skills for consistent, high-quality Wiom product output. Used by tech and product teams to make design decisions without designer sign-off on every edge case.
+Design system skills + audit pipeline for consistent, high-quality Wiom product output. Used by tech and product teams to make design decisions without designer sign-off on every edge case.
 
-## Skills
+## Pipeline
 
-| Skill | What it decides | Lines |
-|-------|----------------|-------|
-| [`wiom-interaction-patterns`](skills/wiom-interaction-patterns/SKILL.md) | What pattern, where, when, what states | ~1100 |
-| [`wiom-visual-craft`](skills/wiom-visual-craft/SKILL.md) | Tokens, hierarchy, elevation, polish, motion, audit | ~700 |
-| [`wiom-ux-copy`](skills/wiom-ux-copy/SKILL.md) | Tone, copy, labels, errors, bilingual patterns | ~800 |
-| [`maverick-developer`](skills/maverick-developer/SKILL.md) | Figma-to-code with engine integration | ~400 |
+```
+PRD → Design (engine skills) → Build (frontend + maverick) → Audit (pratibimb) → Deploy
+```
 
-## Output Format
+See [`ENGINE_WORKFLOW.md`](ENGINE_WORKFLOW.md) for the full pipeline documentation.
 
-Compose-ready. Every skill produces Kotlin/Jetpack Compose specs, not Figma specs. Users expect native APKs as the first interaction with engine output.
+## Repository Structure
 
-## Personas (embedded in all skills)
+```
+Solution-Design-engine-V1/
+├── ENGINE_WORKFLOW.md              ← Pipeline: which skill at which stage, audit gate
+├── README.md
+├── commands/
+│   └── pratibimb.md                ← Design mode activation + audit protocol
+├── skills/
+│   ├── ux-designer/                ← Universal UX psychology, flows, strategy
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── psychology-deep-dive.md
+│   │       └── patterns-and-flows.md
+│   ├── ui-designer/                ← Universal visual craft, tokens, components
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── design-tokens.md
+│   │       ├── component-library.md
+│   │       └── polish-and-craft.md
+│   ├── wiom-interaction-patterns/  ← ENGINE: 35 Wiom interaction patterns
+│   │   └── SKILL.md
+│   ├── wiom-visual-craft/          ← ENGINE: DS tokens, motion, 56-point audit
+│   │   └── SKILL.md
+│   ├── wiom-ux-copy/               ← ENGINE: Hindi copy, 10 tonal patterns
+│   │   └── SKILL.md
+│   ├── maverick-developer/         ← Figma-to-code + engine integration
+│   │   └── SKILL.md
+│   ├── wiom-frontend-dev/          ← Kotlin/Compose standards
+│   │   └── SKILL.md
+│   └── wiom-design-system.md       ← Full Wiom DS reference (tokens, variable IDs)
+├── project_pratibimb_framework_v2.md
+└── feedback_pratibimb_v2_preservation.md
+```
+
+## Skills — What Each One Does
+
+### Engine Skills (Wiom-specific, new)
+| Skill | Sections | What it decides |
+|-------|----------|----------------|
+| [`wiom-interaction-patterns`](skills/wiom-interaction-patterns/SKILL.md) | 35 | Patterns (bottom sheet types, CTAs, dialogs, forms, camera, progress), navigation, state machines |
+| [`wiom-visual-craft`](skills/wiom-visual-craft/SKILL.md) | 12+ | Token application (WHEN to use each), radius, typography, motion, 56-point quality audit |
+| [`wiom-ux-copy`](skills/wiom-ux-copy/SKILL.md) | 17+ | CTA labels, error messages, status labels, 10 tonal patterns, bilingual AppStrings |
+
+### Foundation Skills (universal, trained through real work)
+| Skill | What it provides |
+|-------|-----------------|
+| [`ux-designer`](skills/ux-designer/SKILL.md) | UX psychology (cognitive load, Hick's Law, decision architecture), flow strategy, verification checklists |
+| [`ui-designer`](skills/ui-designer/SKILL.md) | Visual craft (8pt grid, type scales, 60-30-10 color), component specs, polish techniques |
+
+### Build Skills
+| Skill | Role |
+|-------|------|
+| [`wiom-frontend-dev`](skills/wiom-frontend-dev/SKILL.md) | Kotlin/Compose standards: @Preview, Dimens.kt, sealed state, bilingual, project structure |
+| [`maverick-developer`](skills/maverick-developer/SKILL.md) | Figma extraction + spec-first build + 35 corrections + engine integration protocol |
+
+### Design System + Commands
+| File | Role |
+|------|------|
+| [`wiom-design-system.md`](skills/wiom-design-system.md) | Full Wiom DS: color tokens, typography (22 styles), spacing, variable IDs, binding patterns |
+| [`pratibimb.md`](commands/pratibimb.md) | Activation command: loads design skills, runs audit protocol, DS token binding |
+
+## When to Load Which Skill
+
+| Task | Load |
+|------|------|
+| Reading PRD, deciding screens | `wiom-interaction-patterns` + `wiom-ux-copy` |
+| Building Kotlin/Compose | `wiom-frontend-dev` + `wiom-visual-craft` + `wiom-ux-copy` |
+| Extracting from Figma + building | `maverick-developer` (includes engine refs) |
+| Pre-deploy audit | `pratibimb` (loads all design skills) |
+| Reviewing someone's build | `wiom-visual-craft` (56-point audit) |
+
+## Install
+
+```bash
+# Clone
+git clone https://github.com/abhisheksemwal-maker/Solution-Design-engine-V1.git
+
+# Copy skills to Claude Code
+cp -r skills/* ~/.claude/skills/
+cp -r commands/* ~/.claude/commands/
+
+# Restart Claude Code — skills appear automatically
+```
+
+## Personas (embedded in all engine skills)
 
 - **Annu Bhaiyya** (CSP/Partner) — low-medium tech, earns through Wiom, trusts numbers
 - **Technician Rohit** (Expert) — medium tech, sequential flows, task-completion driven
@@ -23,56 +103,12 @@ Compose-ready. Every skill produces Kotlin/Jetpack Compose specs, not Figma spec
 
 ## Grounded In
 
-- Wiom Design System (CA_Design-System, `T0klEs1aPBk7BOVZonc8JC`)
+- Wiom Design System (`T0klEs1aPBk7BOVZonc8JC`)
 - 280+ real PA flow screens extracted via Figma Bridge
-- 35 mistake-correction entries from Maverick production builds
+- 35 mistake-correction entries from Maverick builds
 - 10 tonal patterns from real Hindi copy
+- First audit: 6.5/10 → fix → 7.5/10 (proved the gate works)
 
-## Install
+## Preservation Rule
 
-### For Claude Code CLI / Desktop / Web
-
-1. Clone this repo anywhere on your machine
-2. Copy the skill folders into your Claude Code skills directory:
-
-**Mac/Linux:**
-```bash
-cp -r skills/wiom-interaction-patterns ~/.claude/skills/
-cp -r skills/wiom-visual-craft ~/.claude/skills/
-cp -r skills/wiom-ux-copy ~/.claude/skills/
-cp -r skills/maverick-developer ~/.claude/skills/
-```
-
-**Windows (Git Bash):**
-```bash
-cp -r skills/wiom-interaction-patterns "$HOME/.claude/skills/"
-cp -r skills/wiom-visual-craft "$HOME/.claude/skills/"
-cp -r skills/wiom-ux-copy "$HOME/.claude/skills/"
-cp -r skills/maverick-developer "$HOME/.claude/skills/"
-```
-
-3. Restart Claude Code. Skills will appear in the skill list automatically.
-
-### How to Use
-
-**Tech building screens:**
-- Ask: "I need to build the ISP recharge list screen" — Claude loads `wiom-interaction-patterns` for pattern decisions, `wiom-visual-craft` for styling, `wiom-ux-copy` for all text
-- Ask: "Should this be a bottom sheet or dialog?" — gets the 5-type taxonomy with decision framework
-- Ask: "What's the CTA label for payment confirmation?" — gets outcome-first Hindi copy
-
-**Product reviewing:**
-- Ask: "Run the design audit on this screen" — gets the 56-point pixel/UX/polish audit
-- Ask: "Is this the right pattern for team assignment?" — gets the radio selection list pattern with specs
-
-### Updating
-
-When skills are updated, pull from this repo and re-copy to `~/.claude/skills/`. Skills in `~/.claude/skills/` are what Claude Code reads at runtime.
-
-## Relationship to Pratibimb
-
-Pratibimb = activation trigger + existing design skills (ux-designer, ui-designer).
-Engine = orchestration + new skills on top. Independent files, never merged into existing skills.
-
-## Session Log
-
-- **Session 37 (31 Mar 2026):** Full build. 3 skills created, DS-grounded, pattern library from 280+ frames, motion system, 56-point audit, Maverick integration.
+Engine skills are INDEPENDENT files. They never rewrite, merge into, or dilute existing trained skills (ux-designer, ui-designer, maverick core). See `feedback_pratibimb_v2_preservation.md`.
