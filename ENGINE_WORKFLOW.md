@@ -6,21 +6,21 @@ Without this workflow, builds skip design quality gates. The audit just proved i
 
 ---
 
-## Pipeline: PRD → Design → Build → Audit → Deploy
+## Pipeline: PRD → Design → Mr. UX Review → Build → Audit → Deploy
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐     ┌──────────┐     ┌────────┐
-│  PRODUCT     │ ──→ │  DESIGN      │ ──→ │  BUILD      │ ──→ │  AUDIT   │ ──→ │ DEPLOY │
-│  PRD input   │     │  Engine      │     │  Kotlin/    │     │  Pratibimb│     │ APK on │
-│              │     │  Skills      │     │  Compose    │     │  56-point │     │ device │
-└─────────────┘     └──────────────┘     └─────────────┘     └──────────┘     └────────┘
-                                                                  │
-                                                          FAIL? ──┤──→ FIX → re-audit
-                                                                  │
-                                                          PASS? ──┘──→ DEPLOY
+┌─────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐   ┌──────────┐   ┌────────┐
+│ PRODUCT  │→ │  DESIGN   │→ │  MR. UX   │→ │  BUILD   │→ │  AUDIT   │→ │ DEPLOY │
+│ PRD      │   │  Engine   │   │  Review   │   │  Kotlin/ │   │ Pratibimb│   │ APK on │
+│ input    │   │  Skills   │   │  Gate     │   │ Compose  │   │ 56-point │   │ device │
+└─────────┘   └──────────┘   └──────────┘   └─────────┘   └──────────┘   └────────┘
+                                   │                            │
+                           REFINE? ┤→ iterate                  FAIL? ──┤──→ FIX → re-audit
+                                   │                                   │
+                          APPROVE? ┘→ BUILD                   PASS? ──┘──→ DEPLOY
 ```
 
-**The audit gate is MANDATORY. No APK gets installed without passing it.**
+**TWO mandatory gates: Mr. UX (pre-build) + Pratibimb audit (pre-deploy). No shortcuts.**
 
 ---
 
@@ -54,6 +54,46 @@ No skills needed. This is the raw input.
 6. Output: Screen plan with patterns, specs, and copy decided
 
 **Anti-pattern:** Do NOT skip this stage and go straight to building. Every screen must have a pattern decision before code is written.
+
+---
+
+## Stage 2.5: MR. UX REVIEW (Pre-Build Gate)
+
+**Who:** Claude Code with `mr-ux` skill loaded
+**Skill:** `mr-ux/SKILL.md`
+**Trigger:** MANDATORY after design decisions, BEFORE any code is written
+
+**What Mr. UX evaluates (per screen):**
+
+| Dimension | Question |
+|-----------|----------|
+| User's Goal | What is the user trying to accomplish at this step? |
+| User's Expectation | What mental model do they carry from the previous step? |
+| How Screen Delivers | Info hierarchy, action clarity, confidence building |
+| Friction Audit | Can this screen be eliminated/simplified? Unnecessary cognitive load? |
+| UX Copy Review | Current vs refined copy with reasoning (table format) |
+| Delight Opportunities | Trust signals, earning reinforcement, memorable micro-moments |
+| Verdict | SHIP / REFINE / RETHINK / ELIMINATE |
+
+**Flow-level analysis (after all screens):**
+- Emotional arc mapping (per screen)
+- Screens to eliminate/merge/reorder
+- Copy consistency check (CTA patterns, tone, bilingual parity)
+- Biggest opportunity + biggest risk
+
+**Output format:**
+```
+MR. UX REVIEW — [Flow Name] — [Date]
+SCREENS REVIEWED: [N]
+VERDICT: [READY TO BUILD / NEEDS REFINEMENT]
+CHANGES REQUIRED BEFORE BUILD: [numbered list]
+COPY REFINEMENTS IDENTIFIED: [N]
+APPROVED BY: [user confirms]
+```
+
+**Gate rule:** Build does NOT proceed until user approves the review. If verdict is NEEDS REFINEMENT, iterate on identified changes, then re-review.
+
+**Anti-pattern:** Do NOT skip Mr. UX and go straight to build. Code is expensive; thinking is cheap. Every screen must justify its existence from the user's perspective.
 
 ---
 
@@ -193,6 +233,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 | When you're doing... | Load these skills |
 |---------------------|-------------------|
 | Reading a PRD, deciding screens | `wiom-interaction-patterns` + `wiom-ux-copy` |
+| Evaluating screens before build | `mr-ux` (pre-build UX gate — MANDATORY) |
 | Building Kotlin/Compose code | `wiom-frontend-dev` + `wiom-visual-craft` + `wiom-ux-copy` |
 | Extracting from Figma + building | `maverick-developer` (includes engine integration) |
 | Running pre-deploy audit | `pratibimb` (activates all design skills) |
