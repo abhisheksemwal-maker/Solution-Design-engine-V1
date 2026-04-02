@@ -1233,16 +1233,20 @@ Card: bg:#F1EDF7 or bg:#FFFFFF, r:16, p:[8-12,16,8-12,16]
 
 ```
 Card: 328×92, bg:#F1EDF7, r:16, p:[16,16,16,16]
-  HORIZONTAL layout:
-    Left: VERTICAL gap:4
-      Label: "Wallet balance" / "वॉलेट बैलेंस" fs:16/400 #161021
-      Amount: "₹17,330" fs:24/700 #161021
-    Right: illustration (60×60)
+  VERTICAL gap:16, align(pAl:CENTER, cAl:CENTER)
+    Top Section: 296×60, VERTICAL gap:24, align:CENTER
+      Inner: 296×60, HORIZONTAL SPACE_BETWEEN, align:CENTER
+        Left: VERTICAL gap:4
+          Label: "वॉलेट बैलेंस" fs:16/Regular #161021
+          Amount: "₹17,330" fs:24/Bold #161021
+        Right: Wallet illustration instance (60×60)
 ```
-- Amount is ALWAYS the largest text (fs:24/700)
+- Amount is ALWAYS the largest text (fs:24/Bold)
 - Label above amount, not below
 - Illustration on right provides visual anchor without competing with the number
 - Used above forms where the balance is context (send money, recharge)
+- Inner frame uses SPACE_BETWEEN to push amount left and illustration right
+- The card centers its content (both axes) — wallet balance is a hero element
 
 ---
 
@@ -1402,3 +1406,535 @@ Ghost CTA: bg matches screen background (#FAF9FC), NO border, NO stroke
 - [ ] Sequential flow has segmented progress bar (2dp height, gap:8, r:4)
 - [ ] Ticket screens have timeline bar (88dp, bg:#F1EDF7) with deadline
 - [ ] Persona check: would [Annu/Rohit/Verma] understand this screen in 5 seconds?
+
+---
+
+## 36. Incentive Hero Card Pattern (Earn Money Dashboard)
+
+Large incentive card at the top of the Earn Money landing — the primary motivational hook.
+
+```
+Card: 328×190, bg:#E8E4F0, stk:#D7D3E0 1px, r:16, p:[16,16,16,16]
+  VERTICAL gap:16
+  
+  Top: HORIZONTAL gap:16, align:CENTER
+    Left: Icon circle group (96×96)
+      Ellipse: 96×96 bg:#FAF9FC (white circle)
+      Inner: wallet/money illustration 58×58
+    Right: HORIZONTAL gap:8 align:CENTER
+      Amount: "₹500" fs:32/Bold #161021 — THE hero number
+      Label: "इंसेंटिव" fs:16/Bold #161021 — positioned as suffix
+  
+  Bottom: Primary CTA
+    328-(2*16)=296w, p:[11,16,11,16], bg:#D9008D, r:12
+    Text: "अभी पाएं" fs:16/Bold #FAF9FC, textAlign:CENTER
+```
+
+### Key differences from Hero Action Card (#19):
+| Feature | Hero Action Card (#19) | Incentive Hero Card (#36) |
+|---------|----------------------|--------------------------|
+| Background | #FFE5F6 (pink tint) | #E8E4F0 (neutral/200) |
+| CTA style | 72×72 circle (right) | Full-width bar (bottom) |
+| Content layout | Side-by-side text+circle | Stacked icon/amount/CTA |
+| Primary number | Stats below card | Amount inline with icon |
+| Stroke | #D9008D (brand) | #D7D3E0 (neutral border) |
+
+- When `visible:false` on this card → the screen is in a different state (Wiom Benefits variant)
+- The 96×96 white circle is a pattern for "illustration container" — always white bg inside colored card
+
+**Wiom Benefits variant (hidden/collapsed):**
+```
+Card: 328×104, bg:#F1EDF7, r:16, p:[24,16,24,16]
+  HORIZONTAL gap:164
+    Left: VERTICAL gap:4
+      Label: "Wiom Benefits" fs:16/Regular #161021
+      Amount: "₹50,000" fs:24/Bold #161021
+    Right: arrow icon 24×24 (chevron)
+```
+- This is the same card in collapsed/summary state
+- Chevron indicates expandable — tap opens detail view
+
+---
+
+## 37. Device Grid (2x2 Stat Tiles with Status Colors)
+
+A 2x2 grid of device count tiles, each with a status color + icon + label + count.
+
+```
+Container: 328×320, layoutMode:NONE (absolute positioned children, NOT auto-layout)
+  Each tile: 156×152, r:16
+
+  Tile layout variants:
+  
+  Tile A (neutral — "कस्टमर के घर पर", "ऑफिस में"):
+    bg:#F1EDF7, stk:#E8E4F0 1px
+    Icon circle: 48×48, bg:#FAF9FC, r:50
+      Inner icon: 32×32 device/router
+    Label: fs:14/Regular #161021
+    Count: fs:20/Bold #161021
+  
+  Tile B (action needed — "कस्टमर से वापस लाना है"):
+    bg:#FFE5F6, stk:#FFB2E4 1px
+    Icon circle: 48×48, bg:#FAF9FC, r:50
+      Inner icon + different illustration
+    Label: fs:14/Regular #161021
+    Count: fs:20/Bold #161021
+  
+  Tile C (warning — "वापस नहीं ला पाए"):
+    bg:#FFE9E5, stk:#FF8000 1px
+    Icon circle: 48×48, bg:#FAF9FC, r:50
+    Label: fs:14/Regular #161021
+    Count: fs:20/Bold #161021
+```
+
+### Status color mapping for tiles:
+| Status | Tile bg | Tile stroke | Semantic |
+|--------|---------|-------------|----------|
+| Normal/neutral | #F1EDF7 | #E8E4F0 | Default state, no action needed |
+| Action required | #FFE5F6 | #FFB2E4 | Pink tint — needs user action |
+| Warning/overdue | #FFE9E5 | #FF8000 | Orange warning — overdue |
+
+- Grid is NOT auto-layout — tiles positioned absolutely (2 cols, 2 rows, 16dp gap)
+- Badge count overlay: 20×20 circle, bg:#D9008D, text fs:12 #FFFFFF — overlaps top-right of tile (hidden by default)
+- Tile count is ALWAYS the largest text (fs:20/Bold) — positioned at bottom
+- Label above count, icon above label — top-to-bottom reading order
+
+---
+
+## 38. Net Box Count Hero (My Devices / Earn Money)
+
+The dominant number display showing total device count, used across multiple screens:
+
+```
+Container: 296×hug, HORIZONTAL gap:12, align(pAl:SPACE_BETWEEN, cAl:CENTER), sizing:FILL
+  Left: Hero number
+    "50" fs:48/Bold #161021 — THE dominant visual element
+  Right: Inline CTA (optional)
+    140×44, bg:#D9008D, stk:#D9008D, r:12, p:[8,12,8,12]
+    HORIZONTAL gap:8 align:CENTER
+      "चेक करें" fs:14/SemiBold #FAF9FC
+      Chevron icon 24×24
+```
+
+**Context card wrapping the hero number:**
+```
+Card 5: 328×200, bg:#F1EDF7, stk:#E8E4F0 1px, r:24, p:[16,16,16,16]
+  VERTICAL gap:12
+    Icon circle: 48×48 ellipse bg:#FAF9FC + 32×32 device icon
+    Title: "आपके खाते में चढ़े हुए नेट बॉक्स" fs:24/Regular #161021
+    Number + CTA row (see above)
+```
+
+**Design rules:**
+- r:24 (not r:16) — larger radius for this card type due to its prominence
+- Icon is OUTSIDE the icon circle pattern (Group, not Frame) — Ellipse 48×48 + Icon 32×32
+- The number fs:48 is the LARGEST text in the entire Wiom Partner App
+- Line (divider) between this card and the device grid below: 328×1, stk:#D7D3E0
+
+---
+
+## 39. Order Status Card (PA Instance Component)
+
+Reusable component showing order tracking status with timeline:
+
+```
+PA component: 328×336-372, bg:#FAF9FC, stk:#E8E4F0 1px, r:16, p:[32,16,32,16]
+  VERTICAL gap:40
+
+  Section 1: Main Status (PayG info tag variant)
+    296×112-120, bg:#F1E5FF, stk:#6D17CE, r:(inherited from parent)
+    HORIZONTAL gap:12, p:[32,12,32,12]
+      icon_2layer: 48×48 (Ellipse bg:#E4CCFF + icon 24×24)
+      Status text: "आपके ऑर्डर पर काम चल रहा है" fs:20/Bold #161021
+
+  Section 2: Delivery detail
+    VERTICAL gap:40
+      Composite timeline: 296×56 (segmented progress)
+        Timeline element: 261×24, p:[0,2,0,2] — progress bar
+        State container: HORIZONTAL SPACE_BETWEEN — label pills below bar
+      Order info:
+        "10 नेट बॉक्स का आर्डर" fs:16/Bold #161021
+        "पहुँचने की संभावित तारीख: 15 सितम्बर" fs:14/Regular #665E75
+```
+
+**Key implementation details:**
+- This is a component instance (PA) — same structure across all Earn Money screens
+- The timeline element uses SPACE_BETWEEN for distributing state labels under the bar
+- Status text uses info purple styling (#F1E5FF bg + #6D17CE stroke) — same as PayG info tag
+- This card sits inside a #443152 (brand/secondary dark) parent area
+- Padding [32,16,32,16] is unusually large — provides breathing room for this important status
+
+---
+
+## 40. Transaction Card (Wallet History)
+
+Two-section card for transaction history entries:
+
+```
+Card: 328×180-184, VERTICAL gap:0, sizing:HUG
+  
+  Top bar: 328×64, bg:#E8E4F0, stk:#D7D3E0, p:[12,16,12,16]
+    HORIZONTAL gap:12, align:CENTER
+      Icon: Group 40×40 (vector icon bg:#FAF9FC r:24 + 24×24 icon)
+      Label: "Installation : Cash Payment" fs:14/SemiBold #161021, sizing:HUG
+      Amount: "-₹449" fs:16/Bold #E01E00 (debit=red), textAlign:RIGHT, sizing:FILL
+  
+  Body: 328×120, bg:#FAF9FC, stk:#D7D3E0, p:[12,16,12,16]
+    VERTICAL gap:16
+      Device row: HORIZONTAL SPACE_BETWEEN
+        Left: HORIZONTAL gap:4
+          router icon 20×20
+          "ID: ABC123" fs:12/Regular #665E75
+        Right: arrow chevron 20×20 brand/600
+      
+      Time + balance row: HORIZONTAL gap:40, 296w FILL
+        "19 Oct 2022, 02:35 pm" fs:12/Regular #665E75
+        "Closing balance: ₹1245" fs:12/Regular #665E75, textAlign:RIGHT
+      
+      Comment bubble: 296×28, bg:#E8E4F0, r:12, p:[6,12,6,12]
+        inner: HORIZONTAL gap:24, MAX alignment (right-aligned content)
+```
+
+### Transaction amount color rules:
+| Type | Color | Prefix |
+|------|-------|--------|
+| Debit (outgoing) | #E01E00 (red) | - (minus sign) |
+| Credit (incoming) | #008043 (green) | + (plus sign) |
+
+**NEW PATTERN — Comment bubble inside card:**
+- 296×28, bg:#E8E4F0, r:12, p:[6,12,6,12]
+- Used for transaction notes/comments
+- Sits at bottom of card body
+- Inner text: fs:12/Regular, MAX horizontal alignment
+
+---
+
+## 41. Pill Selector / Filter Bar Pattern
+
+Horizontal scrollable filter pills at the top of list views:
+
+```
+Container: Group wrapper
+  bg:#F1EDF7, stk:#D7D3E0 — sticky bar background
+  Inner: 328×36, HORIZONTAL gap:16, p:[0,0,0,0]
+  
+  Pill (selected): bg:#FFCCED, stk:#D9008D, r:8, p:[8,12,8,12]
+    Text: fs:14/SemiBold #1A1A1A
+  
+  Pill (unselected, no dropdown): bg:transparent, stk:#D7D3E0, r:8, p:[7,12,7,12]
+    Text: fs:16/Regular #1A1A1A
+  
+  Pill (unselected, with dropdown): bg:transparent, stk:#D7D3E0, r:8
+    HORIZONTAL gap:4, p:[7,12,7,12]
+    Text: fs:16/Regular #1A1A1A
+    Dropdown arrow: 20×20 icon
+```
+
+**Key details:**
+- Selected pill uses `fs:14/SemiBold` (one size smaller + bolder than unselected `fs:16/Regular`)
+- Sticky positioning at top of scrollable list
+- Date section headers between transaction groups: 360×36, bg:#F1EDF7, p:[8,16,8,16]
+  - Date text: fs:14/SemiBold #161021
+
+---
+
+## 42. Binary Choice Bottom Sheet
+
+A bottom sheet presenting exactly two equal-weight choices (yes/no, accept/reject):
+
+```
+Sheet: 360×236, VERTICAL gap:0
+  Header: 360×88
+    Drag handle: 120×4, bg:#D7D3E0, r:4 (standard)
+    Title: "क्या स्पीड सही आ रही है?" fs:24/Bold #161021
+    Heading padding: p:[8,16,8,16]
+  
+  Cards: HORIZONTAL gap:16, p:[24,16,48,16], bg:#FAF9FC
+    Card 1 (unselected): 156×76, bg:#FAF9FC, stk:#D9008D, r:16, p:[24,12,24,12]
+      Text: "नहीं" fs:20/Bold #D9008D, textAlign:CENTER
+    Card 2 (unselected): 156×76, bg:#FAF9FC, stk:#D9008D, r:16, p:[24,12,24,12]
+      Text: "हाँ" fs:20/Bold #D9008D, textAlign:CENTER
+    
+    Card (selected state): bg:#FFCCED (pink tint), stk:#D9008D, r:16
+      Text: same as above
+```
+
+### Differences from Type B Bottom Sheet (#12):
+- Type B uses radio buttons for selection — this uses TAPPABLE CARDS
+- Cards are equal width (FILL sizing), not fixed
+- p:[24,16,**48**,16] — extra bottom padding (48dp) for comfortable tap zone
+- Only 2 options ever — not extensible to 3+
+- Selection feedback: bg changes from #FAF9FC to #FFCCED
+- Used for binary decisions during installation flow (speed OK? device OK?)
+
+---
+
+## 43. Checkbox CTA (Confirmation Statement Button)
+
+A CTA that doubles as a confirmation checkbox — user must "check" by tapping:
+
+```
+Variant A (outline/unchecked):
+  328×48, stk:#D9008D, r:16 (or r:12), NO fill
+  HORIZONTAL gap:8, p:[12,16,12,16], align:CENTER
+    Checkbox: 24×24, stroke only #D9008D
+    Text: fs:16/Bold #D9008D — confirmation statement
+
+Variant B (filled/checked):
+  328×48, bg:#D9008D, r:12
+  HORIZONTAL gap:12, p:[12,16,12,16], align:CENTER
+    Checkbox: 24×24, check mark #FAF9FC
+    Text: fs:16/Bold #FAF9FC — same statement
+```
+
+**Usage contexts found:**
+1. Confirm Delivery: "हाँ, 10 नेट बॉक्स का ऑर्डर मिल गया" (filled variant)
+2. Customer ISP Account: "कस्टमर का ISP अकाउंट बना लिया है" (outline variant)
+3. 3-pin Plug dialog: "मैंने 3-पिन प्लग रख लिया है" (inside dialog)
+
+**Key rules:**
+- Text is ALWAYS a statement (not a question) — "I confirm X happened"
+- Outlined = unchecked/pending state, Filled = confirmed state
+- Checkbox icon changes between variants: outline (unchecked) vs filled check (checked)
+- When inside a dialog: gap:12 (not gap:8), no fill, no CTA container
+- When as standalone CTA: standard 328×48 sizing
+
+---
+
+## 44. Dialog with Image + Checkbox Confirmation
+
+A dialog pattern combining education content (image) with an acknowledgement checkbox:
+
+```
+Dialog: 312×476, bg:#FAF9FC, r:24, p:[32,24,32,24]
+  VERTICAL gap:48
+  
+  Head section: 264×340, VERTICAL gap:24
+    Image area: 264×200, bg:#F1E5FF, r:12, center-aligned
+      Content image (product photo, eg 3-pin plug)
+    Text area: 264×hug, VERTICAL gap:12
+      Title: fs:20/Bold #161021
+      Bullet points: VERTICAL gap:12 (each with icon + text)
+  
+  Footer: Checkbox confirmation row
+    HORIZONTAL gap:12
+      checkbox-tick icon: 24×24
+      Statement text: fs:16/Bold #161021
+```
+
+**State transitions:**
+- Checkbox unchecked: icon #352D42 (dark neutral)
+- Checkbox checked: icon #D9008D (brand) — changes to filled tick
+- gap:48 between head and footer creates strong visual separation
+
+---
+
+## 45. Urgency Timer Card (Order Arrival Notification)
+
+Purple-tinted card with countdown timer for time-sensitive actions:
+
+```
+Card: 328×138, bg:#F1E5FF, stk:#D6B2FF, r:16, p:[16,12,16,12]
+  VERTICAL gap:8, align(cAl:MIN)
+  
+  Row 1: HORIZONTAL gap:8
+    Timer-Group: 117×42, bg:#FAF9FC, r:24, p:[0,16,0,16]
+      countdown or status display
+  
+  Row 2: HORIZONTAL SPACE_BETWEEN, 304w FILL
+    Left: VERTICAL gap:4
+      Status info text
+    Right: 24×24 chevron icon
+  
+  Row 3: HORIZONTAL gap:10, p:[0,0,0,8], stk:#6D17CE (bottom border)
+    "10 नेट बॉक्स का आर्डर आप तक पहुँच गया है" fs:14/Regular #6D17CE
+```
+
+**Key details:**
+- Uses the purple info palette (#F1E5FF bg, #D6B2FF stroke, #6D17CE accent text)
+- Timer-Group has pill shape (r:24) with white bg — stands out visually
+- Bottom row has purple bottom-stroke only (not full border) — info system signal
+- This is the delivery-arrival variant of the PayG Info Tag (#29)
+
+---
+
+## 46. Account/Bank Detail Card (Send Money Flow)
+
+Card showing verified bank account information:
+
+```
+Card: 328×100, stk:#E8E4F0, r:16, p:[16,16,16,16]
+  HORIZONTAL gap:12, align:TOP
+  
+  Left: 48×48 icon container
+    Ellipse: 48×48, bg:#F1EDF7
+    Bank logo: 24×24 (image fill)
+  
+  Right: VERTICAL gap:4, 236w
+    Name: "Ashutosh Mishra" fs:16/Bold #161021
+    Account: "Acc no. : XXXXXXXX6264" fs:14/Regular #161021
+    IFSC: "IFSC : ICIC0000716" fs:12/Regular #161021
+```
+
+**Typography hierarchy:**
+- Name: fs:16/Bold — primary identifier
+- Account number: fs:14/Regular — secondary
+- IFSC code: fs:12/Regular — tertiary (smallest)
+- All text #161021 — no color differentiation, hierarchy is purely size/weight
+
+---
+
+## 47. Summary Confirmation Card (Send Money Breakdown)
+
+Extension of Summary Card (#27) with specific patterns for financial confirmations:
+
+```
+Card (info_card_3): 328×136, stk:#E8E4F0, r:16, p:[16,16,16,16]
+  NO fill (transparent) — different from standard summary card
+  
+  Inner: 296×104, VERTICAL gap:16, sizing:FILL
+    Row pattern (repeated 3x):
+      HORIZONTAL gap:16, 296w FILL
+        Label: fs:16/Regular #161021, sizing:FILL, textAlign:LEFT
+        Value: fs:16/Bold #161021, sizing:HUG, textAlign:RIGHT
+    
+    Rows:
+      "अमाउंट जो भेजा जाएगा" → "₹5,000"
+      "शुल्क (0%)" → "₹0"
+      "कुल देय" → "₹5,000"
+```
+
+### Differences from Summary Card (#27):
+| Feature | Summary Card (#27) | Financial Summary (#47) |
+|---------|-------------------|------------------------|
+| Font size | fs:13 | fs:16 (larger for amounts) |
+| Label color | #665E75 (secondary) | #161021 (primary) |
+| Dividers | Between rows | None (gap:16 separation) |
+| Fill | #F1EDF7 | Transparent (stroke only) |
+| Value alignment | Various | Explicit textAlign:RIGHT |
+
+---
+
+## 48. Success State (Payment/Action Complete)
+
+Centered success confirmation with icon, title, and description:
+
+```
+Container: 328×180, VERTICAL gap:24, align(cAl:CENTER)
+  
+  Icon: HORIZONTAL HUG
+    Circle: 96×96, bg:#C9F0DD (light green)
+    Tick: 72×72 instance
+      Filled circle: 48×48, bg:#008043 (success green)
+      Checkmark: 27×21, #FAF9FC
+  
+  Text: VERTICAL gap:8, align(cAl:CENTER)
+    Title: "भुगतान सफल हुआ" fs:24/Bold #161021, textAlign:CENTER
+    Subtitle: "24 से 48 घंटों..." fs:14/Regular #161021, textAlign:CENTER
+```
+
+**Key rules:**
+- Double circle pattern: outer 96×96 light green + inner 48×48 dark green
+- Title fs:24/Bold is the standard "result" size
+- Subtitle fs:14/Regular — keep descriptions brief (one line ideal, two max)
+- Center alignment on BOTH text elements
+- CTA below: "अपने वॉलेट पर जाएं" — navigates FORWARD (not back)
+- Header shows close (X) icon, NOT back arrow — this is an endpoint
+
+---
+
+## 49. Customer Info Bottom Sheet (Data Review)
+
+Bottom sheet for reviewing customer details with confirmation checkbox:
+
+```
+Sheet: 360×356, VERTICAL gap:0
+  
+  Header: 360×88 (standard bottom sheet header)
+    Drag handle: 120×4, bg:#D7D3E0, r:4
+    Title: "कस्टमर डिटेल्स" fs:24/Bold #161021
+
+  Content: 360×268, bg:#FAF9FC, p:[24,16,16,16]
+    VERTICAL gap:36
+    
+    Customer card: 328×144, bg:#FAF9FC, stk:#E8E4F0, r:16, p:[16,16,16,16]
+      VERTICAL gap:12
+        Row 1: HORIZONTAL gap:8
+          user icon 24×24
+          Name + phone: HORIZONTAL gap:12
+        Row 2: HORIZONTAL gap:12
+          pin icon 24×24
+          Address: fs:14/Regular #161021 (multi-line)
+        Row 3: HORIZONTAL SPACE_BETWEEN
+          Details row (date, device info, etc.)
+    
+    Confirmation CTA: Checkbox CTA pattern (#43) outline variant
+      stk:#D9008D, r:16
+      "कस्टमर का ISP अकाउंट बना लिया है"
+```
+
+**Key: gap:36 between card and CTA** — larger than standard (24) to create visual breathing room before the commitment action.
+
+---
+
+## 50. Earn Money Home Dashboard Layout (Full Screen Composition)
+
+The full-screen composition pattern for the main Earn Money/My Devices screens:
+
+```
+Screen: 360×720, bg:#FAF9FC
+
+Layer 1 — Header zone (bg:#443152):
+  StatusBar: 24h
+  App bar: 56h (logo + title + rating pill + menu)
+  Tabs: 48h (नेटवर्क बढ़ाएं | पैसे कमाएं)
+  
+  OR (sub-screen):
+  Top App Bar component: 80h
+    StatusBar 24h + Header 56h (back + title + trailing icons)
+
+Layer 2 — Dark content zone (bg:#443152, extends below tabs):
+  p:[24,16,40,16]
+  Order Status Card (#39) instance: 328×336-372
+
+Layer 3 — Scrollable content zone (bg:#FAF9FC):
+  VERTICAL gap:24
+  Net Box Count Card (#38): 328×200, r:24
+  Device Grid (#37): 328×320 (2x2 tiles)
+  Divider: 328×1, stk:#D7D3E0
+  Request CTA bar (#51): 328×76
+
+Floating overlays:
+  Incentive banner: 360×64, bg:#FFD3CC (hidden by default)
+  "Next Step" CTA: bg:#FFD888, stk:#FFBDB3, r:0, p:[12,24,12,24]
+```
+
+### Important layout rules for this screen:
+1. The dark zone (bg:#443152) extends from header INTO the content area
+2. Content area starts NEGATIVE (overlapping the dark zone with rounded cards)
+3. gap:24 is the standard section gap throughout
+4. The screen is scroll-first — content exceeds viewport height (1004px content vs 720px viewport)
+
+---
+
+## 51. Request Device CTA Bar
+
+Horizontal bar prompting users to order more devices:
+
+```
+Bar: 328×76, HORIZONTAL SPACE_BETWEEN, p:[16,16,16,16], r:16
+  bg:#FAF9FC, stk:#D7D3E0 1px
+  
+  Left: 140×40 fixed frame
+    Text: "आप 20 नेट बॉक्स और जारी करवा सकते हैं" fs:14 (mixed weight) #161021
+  
+  Right: CTA
+    140×44, bg:#D9008D, stk:#D9008D, r:12, p:[8,16,8,16]
+    HORIZONTAL gap:10, center aligned
+    Text: "नए नेट बॉक्स मंगवाएं" fs:14/SemiBold #FAF9FC
+```
+
+- Uses SPACE_BETWEEN to push text and CTA to opposite ends
+- Text area is FIXED width (140) — will truncate/wrap for longer text
+- This is the inline-CTA variant (not stacked dual CTA)
+- Appears below the device grid as a continuation prompt
